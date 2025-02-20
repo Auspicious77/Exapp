@@ -1,19 +1,24 @@
-const express = require('express');
 const path = require('path');
-const rootDir = require('../util/path');  
 
-const router = express.Router();    //router for usingmultiple router
+const express = require('express');
 
+const adminController = require('../controllers/admin');
 
-router.get('/add-product', (req, res) => {
-    res.sendFile(path.join(rootDir, 'views', 'add-product.html'));
-  });
+const router = express.Router();
 
+// /admin/add-product => GET
+router.get('/add-product', adminController.getAddProduct);
 
-  router.post('/product', (req, res) => {
-    console.log(req.body); // Log form data
-    res.redirect('/');
-  });
+// /admin/products => GET
+router.get('/products', adminController.getProducts);
 
+// /admin/add-product => POST
+router.post('/add-product', adminController.postAddProduct);
 
-  module.exports = router;
+// router.get('/edit-product/:productId', adminController.getEditProduct);
+
+router.get('/edit-product/:productId', adminController.getEditProduct);
+
+router.post('/edit-product', adminController.postEditProduct);
+
+module.exports = router;
