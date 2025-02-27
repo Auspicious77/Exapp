@@ -1,50 +1,33 @@
-const express = require('express');
-const path = require('path');
+const express = require('express'); // Import Express framework
+const path = require('path'); // Import the path module to work with file paths
 
-const app = express();
-const expressHbs = require('express-handlebars')
+const app = express(); // Create an Express application instance
+const expressHbs = require('express-handlebars'); // Import Handlebars templating engine (not currently used)
 
-
-// Use Express's built-in body parser middleware
+// Middleware to parse URL-encoded form data
 app.use(express.urlencoded({ extended: true }));
 
-// app.engine('handlebars', expressHbs());
-// app.set('view engine', 'pug');
-// app.set('views', 'handlebars');
-// app.set('views', 'views');
+// Setting up the template engine (Handlebars and Pug are commented out, EJS is used)
+app.set('view engine', 'ejs'); // Set EJS as the template engine
+app.set('views', 'views'); // Set the directory where views (EJS templates) are stored
 
-app.set('view engine', 'ejs');
-app.set('views', 'views');
+const errorController = require('./controllers/error'); // Import the error controller
 
-const errorController = require('./controllers/error')
-
-
-
+// Serve static files (CSS, images, JS) from the "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Import route handlers
+const adminRoute = require('./routes/admin'); // Routes for admin-related pages
+const shopRoute = require('./routes/shop'); // Routes for shop-related pages
 
+// Use imported route handlers
+app.use('/admin', adminRoute); // All routes in adminRoute are prefixed with "/admin"
+app.use(shopRoute); // Shop routes are used without a prefix
 
-
-
-const adminRoute = require('./routes/admin')
-const shopRoute = require('./routes/shop')
-
-
-app.use('/admin', adminRoute);
-app.use(shopRoute);
-
-
-// app.use((req, res) => {
-//   res.sendFile(path.join(__dirname, 'views', '404.html'))
-// })
-
-// app.use(errorController.error);
+// Handle 404 errors using the error controller
 app.use(errorController.get404);
 
-
-
-
-// Start server
+// Start the Express server on port 3000
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
 });
