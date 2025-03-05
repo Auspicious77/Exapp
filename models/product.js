@@ -7,7 +7,7 @@ class Product {
     this.imageUrl = imageUrl;
     this.description = description;
     this.price = price;
-    this._id = id ? new mongodb.ObjectId(id) : null; // ✅ Use mongodb.ObjectId(id)
+    this._id = id ? new mongodb.ObjectId(id) : null; //  mongodb.ObjectId(id)
   }
 
   save() {
@@ -23,7 +23,7 @@ class Product {
         .then((prod) => {
           console.log('Product Created')
           console.log('new product', this)
-              
+
         })
         .catch(err => console.log(err));
     }
@@ -34,7 +34,10 @@ class Product {
     return db.collection('products')
       .find()
       .toArray()
-      .then(products => products)
+      .then(products => {
+        console.log('all Products', products);
+        return products
+      })
       .catch(err => console.log(err));
   }
 
