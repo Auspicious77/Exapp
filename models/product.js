@@ -1,13 +1,13 @@
 const getDb = require('../util/database').getDb;
-const mongodb = require('mongodb');
+const { ObjectId } = require('mongodb'); // ✅ Use "bson" if you're on MongoDB v5+
 
 class Product {
-  constructor(title, imageUrl, description, price, id) {
+  constructor(title, imageUrl, price, description,  id) {
     this.title = title;
     this.imageUrl = imageUrl;
-    this.description = description;
     this.price = price;
-    this._id = id ? new mongodb.ObjectId(id) : null; //  mongodb.ObjectId(id)
+    this.description = description;
+    this._id = id ? new ObjectId(id) : null; 
   }
 
   save() {
@@ -20,11 +20,7 @@ class Product {
     } else {
       return db.collection('products')
         .insertOne(this)
-        .then((prod) => {
-          console.log('Product Created')
-          console.log('new product', this)
-
-        })
+        .then(() => console.log('Product Created'))
         .catch(err => console.log(err));
     }
   }
@@ -35,24 +31,27 @@ class Product {
       .find()
       .toArray()
       .then(products => {
-        console.log('all Products', products);
-        return products
+        console.log('All Products', products);
+        return products;
       })
       .catch(err => console.log(err));
   }
 
-  static findById(id) {
+  static findById(prodId) {
     const db = getDb();
     return db.collection('products')
-      .findOne({ _id: mongodb.ObjectId(id) }) // ✅ No warning
-      .then(product => product)
+      .findOne({ _id: new ObjectId(prodId) })
+      .then(product => {
+        console.log(product);
+        return product;
+      })
       .catch(err => console.log(err));
   }
 
   static deleteById(id) {
     const db = getDb();
     return db.collection('products')
-      .deleteOne({ _id: mongodb.ObjectId(id) }) // ✅ No warning
+      .deleteOne({ _id: new ObjectId(id) })
       .then(() => console.log('Product Deleted'))
       .catch(err => console.log(err));
   }
