@@ -3,6 +3,7 @@ const path = require('path'); // Import the path module to work with file paths
 
 const app = express(); // Create an Express application instance
 const expressHbs = require('express-handlebars'); // Import Handlebars templating engine (not currently used)
+const mongoose = require('mongoose')
 
 
 //import models here...
@@ -29,9 +30,9 @@ const User = require('./models/user');
 
 
 app.use((req, res, next) => {
-  User.findById("67cacaa7e1552e1c5ac316a4").then(user => {
-  req.user = new User(user.name, user.email, user.cart, user._id);
-  next();
+  User.findById("67dab665e7e74e44d73e43cc").then(user => {
+    req.user = user;
+    next();
   }).catch(err => console.log(err))
 
 })
@@ -47,8 +48,31 @@ app.use(errorController.get404);
 //   console.log('Server is running on http://localhost:3000');
 // });
 
-mongoConnect(() => {
-  app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
-});
-});
+// mongoConnect(() => {
+//   app.listen(3000, () => {
+//   console.log('Server is running on http://localhost:3000');
+// });
+// });
+
+mongoose.connect("mongodb+srv://elishaibukun:ExpProject1234@cluster0.qxzkg.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0")
+  .then(result => {
+    User.findOne().then(user => {
+      if (!user) {
+        const user = new User({
+          name: 'Helix',
+          email: "helix@gmail.com",
+          cart: {
+            items: []
+          }
+        })
+        user.save();
+      }
+    });
+ 
+    app.listen(3000);
+    console.log('connected to monogo yeah!!!!')
+    console.log('Server is running on http://localhost:3000');
+
+  }).catch(err => {
+    console.log(err)
+  })
