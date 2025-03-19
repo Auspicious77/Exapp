@@ -8,7 +8,6 @@ const expressHbs = require('express-handlebars'); // Import Handlebars templatin
 //import models here...
 
 
-
 // Middleware to parse URL-encoded form data
 app.use(express.urlencoded({ extended: true }));
 
@@ -26,12 +25,15 @@ const mongoConnect = require('./util/database').mongoConnect;
 // Import route handlers
 const adminRoute = require('./routes/admin'); // Routes for admin-related pages
 const shopRoute = require('./routes/shop'); // Routes for shop-related pages
+const User = require('./models/user');
 
 
 app.use((req, res, next) => {
-
-
+  User.findById("67cacaa7e1552e1c5ac316a4").then(user => {
+  req.user = new User(user.name, user.email, user.cart, user._id);
   next();
+  }).catch(err => console.log(err))
+
 })
 // Use imported route handlers
 app.use('/admin', adminRoute); // All routes in adminRoute are prefixed with "/admin"
