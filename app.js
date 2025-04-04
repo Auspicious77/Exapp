@@ -27,6 +27,14 @@ app.set('views', 'views'); // Set the directory where views (EJS templates) are 
 
 const errorController = require('./controllers/error'); // Import the error controller
 
+// Import route handlers
+const adminRoute = require('./routes/admin'); // Routes for admin-related pages
+const shopRoute = require('./routes/shop'); // Routes for shop-related pages
+const User = require('./models/user');
+const authRoutes = require('./routes/auth');
+
+
+
 // Serve static files (CSS, images, JS) from the "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
@@ -36,22 +44,18 @@ app.use(session({
   store: store
 }))
 
-const mongoConnect = require('./util/database').mongoConnect;
-
-// Import route handlers
-const adminRoute = require('./routes/admin'); // Routes for admin-related pages
-const shopRoute = require('./routes/shop'); // Routes for shop-related pages
-const User = require('./models/user');
-const authRoutes = require('./routes/auth');
-
 
 app.use((req, res, next) => {
-  User.findById("67dab665e7e74e44d73e43cc").then(user => {
-    req.user = user;
-    next();
-  }).catch(err => console.log(err))
-
-})
+  if (!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
+    .then(user => {
+      req.user = user;
+      next();
+    })
+    .catch(err => console.log(err));
+});
 // Use imported route handlers
 app.use('/admin', adminRoute); // All routes in adminRoute are prefixed with "/admin"
 app.use(shopRoute); // Shop routes are used without a prefix
