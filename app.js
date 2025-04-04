@@ -4,13 +4,22 @@ const path = require('path'); // Import the path module to work with file paths
 const app = express(); // Create an Express application instance
 const expressHbs = require('express-handlebars'); // Import Handlebars templating engine (not currently used)
 const mongoose = require('mongoose')
+const session = require('express-session');
+const mongoDbStore = require('connect-mongodb-session')(session)
 
 
 //import models here...
+const MONGODB_URL = 'mongodb+srv://elishaibukun:ExpProject1234@cluster0.qxzkg.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0';
 
 
 // Middleware to parse URL-encoded form data
 app.use(express.urlencoded({ extended: true }));
+
+const store = new mongoDbStore({
+  uri: MONGODB_URL,
+  collection: 'sessions',
+  // expires: '1'
+})
 
 // Setting up the template engine (Handlebars and Pug are commented out, EJS is used)
 app.set('view engine', 'ejs'); // Set EJS as the template engine
@@ -20,6 +29,12 @@ const errorController = require('./controllers/error'); // Import the error cont
 
 // Serve static files (CSS, images, JS) from the "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: 'my secrette', 
+  resave: false, 
+  saveUninitialized:false,
+  store: store
+}))
 
 const mongoConnect = require('./util/database').mongoConnect;
 
@@ -27,6 +42,7 @@ const mongoConnect = require('./util/database').mongoConnect;
 const adminRoute = require('./routes/admin'); // Routes for admin-related pages
 const shopRoute = require('./routes/shop'); // Routes for shop-related pages
 const User = require('./models/user');
+const authRoutes = require('./routes/auth');
 
 
 app.use((req, res, next) => {
@@ -39,6 +55,7 @@ app.use((req, res, next) => {
 // Use imported route handlers
 app.use('/admin', adminRoute); // All routes in adminRoute are prefixed with "/admin"
 app.use(shopRoute); // Shop routes are used without a prefix
+app.use(authRoutes);
 
 // Handle 404 errors using the error controller
 app.use(errorController.get404);
@@ -54,7 +71,7 @@ app.use(errorController.get404);
 // });
 // });
 
-mongoose.connect("mongodb+srv://elishaibukun:ExpProject1234@cluster0.qxzkg.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0")
+mongoose.connect(MONGODB_URL)
   .then(result => {
     User.findOne().then(user => {
       if (!user) {
