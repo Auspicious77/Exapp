@@ -38,7 +38,8 @@ exports.getIndex = (req, res, next) => {
         prods: products,
         pageTitle: 'Shop',
         path: '/',
-        isAuthenticated: req.session.isLoggedIn
+        isAuthenticated: req.session.isLoggedIn,
+       
       });
     })
     .catch(err => {
@@ -46,10 +47,10 @@ exports.getIndex = (req, res, next) => {
     });
 };
 
+
 exports.getCart = (req, res, next) => {
   req.user
     .populate('cart.items.productId')
-    .execPopulate()
     .then(user => {
       const products = user.cart.items;
       res.render('shop/cart', {
@@ -61,6 +62,7 @@ exports.getCart = (req, res, next) => {
     })
     .catch(err => console.log(err));
 };
+
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
