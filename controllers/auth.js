@@ -1,6 +1,9 @@
-const bcrypt = require('bcryptjs');
 
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+
+
+
 
 exports.getLogin = (req, res, next) => {
   res.render('auth/login', {
@@ -49,6 +52,7 @@ exports.postLogin = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
+
 exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -76,6 +80,39 @@ exports.postSignup = (req, res, next) => {
       console.log(err);
     });
 };
+
+// export const postSignup = async (req, res, next) => {
+//   const { email, password, confirmPassword } = req.body;
+
+//   try {
+//     const existingUser = await User.findOne({ email });
+//     if (existingUser) return res.redirect('/signup');
+
+//     const token = Math.floor(10000 + Math.random() * 90000).toString();
+
+//     const hashedPassword = await bcrypt.hash(password, 12);
+//     const newUser = new User({
+//       email,
+//       password: hashedPassword,
+//       verificationToken: token,
+//       isVerified: false,
+//       cart: { items: [] }
+//     });
+
+//     await newUser.save();
+//     const verificationToken = Math.floor(10000 + Math.random() * 90000); // 5-digit code
+
+//     mailtrap.sendVerificationEmail(email, verificationToken)
+//     .then(() => console.log('Email sent'))
+//     .catch(err => console.error('Email failed', err));
+
+//     // res.redirect('/verify');
+//   } catch (error) {
+//     console.error('Signup error:', error);
+//     res.redirect('/signup');
+//   }
+// };
+
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy(err => {
